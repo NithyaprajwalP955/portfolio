@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Database (keep local data & credentials private)
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+
+# Static & Media
+staticfiles/
+
+# Environment files
+.env
+*.env
+!.env.example
+
+# Logs
+*.log
