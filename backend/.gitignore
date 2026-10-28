@@ -9,10 +9,8 @@ venv/
 .venv/
 ENV/
 
-# Database (keep local data & credentials private)
-db.sqlite3
+# Database
 db.sqlite3-journal
-*.sqlite3
 
 # Static & Media
 staticfiles/

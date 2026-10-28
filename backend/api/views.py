@@ -20,6 +20,17 @@ from .serializers import (
 
 
 def ensure_db():
+    if os.environ.get('VERCEL') and not os.environ.get('DATABASE_URL'):
+        from pathlib import Path
+        import shutil
+        tmp_db = Path('/tmp') / 'db.sqlite3'
+        seed_db = Path(__file__).resolve().parent.parent / 'db.sqlite3'
+        if not tmp_db.exists() and seed_db.exists():
+            try:
+                shutil.copyfile(seed_db, tmp_db)
+                return
+            except Exception:
+                pass
     try:
         if not Profile.objects.exists():
             from django.core.management import call_command

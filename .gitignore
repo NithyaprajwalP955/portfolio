@@ -15,10 +15,8 @@ venv/
 .venv/
 ENV/
 
-# Database (keep local credentials and database private)
-db.sqlite3
+# Database
 db.sqlite3-journal
-*.sqlite3
 
 # Static & Build
 staticfiles/
