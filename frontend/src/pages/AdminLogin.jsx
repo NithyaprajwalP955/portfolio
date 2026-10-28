@@ -13,11 +13,14 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     try {
-      await login(form.username, form.password);
+      await login(form.username.trim(), form.password);
       navigate('/admin');
     } catch (err) {
-      setError(err.response?.data?.error || 'Invalid credentials. Please try again.');
+      const msg = err.response?.data?.error || err.response?.data?.detail || 'Invalid credentials. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }

@@ -131,10 +131,12 @@ def submit_contact(request):
 
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        ensure_db()
+        username = (request.data.get('username') or '').strip()
+        password = request.data.get('password', '')
         user = authenticate(username=username, password=password)
         if user and user.is_staff:
             refresh = RefreshToken.for_user(user)

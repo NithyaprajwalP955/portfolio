@@ -20,8 +20,11 @@ const API = axios.create({
 
 // Only attach JWT token for admin routes
 API.interceptors.request.use((config) => {
-  const isAdminRoute = config.url && config.url.startsWith('/admin/');
-  if (isAdminRoute) {
+  const isLoginRoute = config.url && config.url.includes('/admin/login/');
+  const isAdminRoute = config.url && config.url.startsWith('/admin/') && !isLoginRoute;
+  if (isLoginRoute) {
+    delete config.headers.Authorization;
+  } else if (isAdminRoute) {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

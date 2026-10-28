@@ -178,16 +178,13 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('  [OK] Achievements created'))
 
         # --- Superuser ---
-        if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser(
-                username='admin',
-                password='admin123',
-                email='nithyaprajwal955@gmail.com',
-                is_staff=True,
-            )
-            self.stdout.write(self.style.SUCCESS('  [OK] Admin user created (username: admin, password: admin123)'))
-        else:
-            self.stdout.write('  Admin user already exists')
+        for uname in ['astrox38d', 'admin']:
+            u, _ = User.objects.get_or_create(username=uname, defaults={'email': 'nithyaprajwal955@gmail.com'})
+            u.set_password('admin123')
+            u.is_staff = True
+            u.is_superuser = True
+            u.save()
+            self.stdout.write(self.style.SUCCESS(f'  [OK] Admin user {uname} ready (password: admin123)'))
 
         self.stdout.write(self.style.SUCCESS('\n[DONE] Database seeded successfully!\n'))
         self.stdout.write('Admin credentials:')
