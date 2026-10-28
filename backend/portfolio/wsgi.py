@@ -19,10 +19,11 @@ app = application
 # Auto-migrate and seed on Vercel if using ephemeral sqlite
 if os.environ.get('VERCEL') and not os.environ.get('DATABASE_URL'):
     try:
-        from django.core.management import call_command
-        from api.models import Profile
-        if not Profile.objects.exists():
+        from pathlib import Path
+        tmp_db = Path('/tmp') / 'db.sqlite3'
+        if not tmp_db.exists() or tmp_db.stat().st_size == 0:
+            from django.core.management import call_command
             call_command('migrate', interactive=False)
             call_command('seed_data')
-    except Exception:
-        pass
+    except Exception as e:
+        print("Vercel wsgi auto-migrate error:", e)

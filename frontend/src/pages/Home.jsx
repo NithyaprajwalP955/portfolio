@@ -13,23 +13,26 @@ import {
   fetchProfile, fetchExperience, fetchProjects, fetchSkills,
   fetchEducation, fetchCertifications, fetchAchievements,
 } from '../api';
+import {
+  initialProfile, initialExperience, initialProjects, initialSkills,
+  initialEducation, initialCertifications, initialAchievements,
+} from '../data/portfolioData';
 
 export default function Home() {
   const [data, setData] = useState({
-    profile: null,
-    experience: [],
-    projects: [],
-    skills: [],
-    education: [],
-    certifications: [],
-    achievements: [],
+    profile: initialProfile,
+    experience: initialExperience,
+    projects: initialProjects,
+    skills: initialSkills,
+    education: initialEducation,
+    certifications: initialCertifications,
+    achievements: initialAchievements,
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [profile, experience, projects, skills, education, certifications, achievements] = await Promise.all([
+        const results = await Promise.allSettled([
           fetchProfile(),
           fetchExperience(),
           fetchProjects(),
@@ -38,31 +41,23 @@ export default function Home() {
           fetchCertifications(),
           fetchAchievements(),
         ]);
-        setData({
-          profile: profile.data,
-          experience: experience.data,
-          projects: projects.data,
-          skills: skills.data,
-          education: education.data,
-          certifications: certifications.data,
-          achievements: achievements.data,
-        });
+        const [profileRes, expRes, projRes, skillsRes, eduRes, certsRes, achRes] = results;
+
+        setData(prev => ({
+          profile: (profileRes.status === 'fulfilled' && profileRes.value?.data?.name) ? profileRes.value.data : prev.profile,
+          experience: (expRes.status === 'fulfilled' && Array.isArray(expRes.value?.data) && expRes.value.data.length > 0) ? expRes.value.data : prev.experience,
+          projects: (projRes.status === 'fulfilled' && Array.isArray(projRes.value?.data) && projRes.value.data.length > 0) ? projRes.value.data : prev.projects,
+          skills: (skillsRes.status === 'fulfilled' && Array.isArray(skillsRes.value?.data) && skillsRes.value.data.length > 0) ? skillsRes.value.data : prev.skills,
+          education: (eduRes.status === 'fulfilled' && Array.isArray(eduRes.value?.data) && eduRes.value.data.length > 0) ? eduRes.value.data : prev.education,
+          certifications: (certsRes.status === 'fulfilled' && Array.isArray(certsRes.value?.data) && certsRes.value.data.length > 0) ? certsRes.value.data : prev.certifications,
+          achievements: (achRes.status === 'fulfilled' && Array.isArray(achRes.value?.data) && achRes.value.data.length > 0) ? achRes.value.data : prev.achievements,
+        }));
       } catch (err) {
         console.error('Failed to load portfolio data:', err);
-      } finally {
-        setLoading(false);
       }
     };
     load();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="loader">
-        <div className="spinner" />
-      </div>
-    );
-  }
 
   return (
     <>

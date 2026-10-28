@@ -19,53 +19,92 @@ from .serializers import (
 )
 
 
+def ensure_db():
+    try:
+        if not Profile.objects.exists():
+            from django.core.management import call_command
+            call_command('seed_data')
+    except Exception:
+        try:
+            from django.core.management import call_command
+            call_command('migrate', interactive=False)
+            call_command('seed_data')
+        except Exception as e:
+            print("Auto-migrate error:", e)
+
+
 # ─── Public Read Endpoints ────────────────────────────────────────────────────
 
 @api_view(['GET'])
 def get_profile(request):
     try:
+        ensure_db()
         profile = Profile.objects.first()
         if not profile:
             return Response({}, status=200)
         return Response(ProfileSerializer(profile, context={'request': request}).data)
     except Exception as e:
-        return Response({'error': str(e)}, status=500)
+        return Response({'error': str(e)}, status=200)
 
 
 @api_view(['GET'])
 def get_experience(request):
-    items = Experience.objects.all()
-    return Response(ExperienceSerializer(items, many=True).data)
+    try:
+        ensure_db()
+        items = Experience.objects.all()
+        return Response(ExperienceSerializer(items, many=True).data)
+    except Exception:
+        return Response([])
 
 
 @api_view(['GET'])
 def get_projects(request):
-    items = Project.objects.all()
-    return Response(ProjectSerializer(items, many=True).data)
+    try:
+        ensure_db()
+        items = Project.objects.all()
+        return Response(ProjectSerializer(items, many=True).data)
+    except Exception:
+        return Response([])
 
 
 @api_view(['GET'])
 def get_skills(request):
-    items = SkillCategory.objects.all()
-    return Response(SkillCategorySerializer(items, many=True).data)
+    try:
+        ensure_db()
+        items = SkillCategory.objects.all()
+        return Response(SkillCategorySerializer(items, many=True).data)
+    except Exception:
+        return Response([])
 
 
 @api_view(['GET'])
 def get_education(request):
-    items = Education.objects.all()
-    return Response(EducationSerializer(items, many=True).data)
+    try:
+        ensure_db()
+        items = Education.objects.all()
+        return Response(EducationSerializer(items, many=True).data)
+    except Exception:
+        return Response([])
 
 
 @api_view(['GET'])
 def get_certifications(request):
-    items = Certification.objects.all()
-    return Response(CertificationSerializer(items, many=True).data)
+    try:
+        ensure_db()
+        items = Certification.objects.all()
+        return Response(CertificationSerializer(items, many=True).data)
+    except Exception:
+        return Response([])
 
 
 @api_view(['GET'])
 def get_achievements(request):
-    items = Achievement.objects.all()
-    return Response(AchievementSerializer(items, many=True).data)
+    try:
+        ensure_db()
+        items = Achievement.objects.all()
+        return Response(AchievementSerializer(items, many=True).data)
+    except Exception:
+        return Response([])
 
 
 @api_view(['POST'])
