@@ -306,3 +306,25 @@ def admin_messages_detail(request, pk):
         return Response({'message': 'Deleted'}, status=204)
     except ContactMessage.DoesNotExist:
         return Response({'error': 'Not found'}, status=404)
+
+
+import mimetypes
+from django.http import FileResponse, Http404
+from django.conf import settings
+from pathlib import Path
+
+
+def serve_media(request, path):
+    # Check /tmp/media first (uploaded files on Vercel)
+    tmp_path = Path('/tmp') / 'media' / path
+    if tmp_path.exists() and tmp_path.is_file():
+        content_type, _ = mimetypes.guess_type(str(tmp_path))
+        return FileResponse(open(tmp_path, 'rb'), content_type=content_type)
+
+    # Check BASE_DIR / media (bundled files)
+    bundled_path = settings.BASE_DIR / 'media' / path
+    if bundled_path.exists() and bundled_path.is_file():
+        content_type, _ = mimetypes.guess_type(str(bundled_path))
+        return FileResponse(open(bundled_path, 'rb'), content_type=content_type)
+
+    raise Http404("Media file not found")

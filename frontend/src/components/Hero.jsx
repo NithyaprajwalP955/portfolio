@@ -7,7 +7,7 @@ export default function Hero({ data }) {
   const resumeHref = data.resume_url || `${fallbackBackend}/media/resume/PRAJWAL_RESUME.pdf`;
   const photoSrc = data.photo_url
     ? (data.photo_url.startsWith('http') ? data.photo_url : `${fallbackBackend}${data.photo_url}`)
-    : null;
+    : '/profile/prajwal.jpg';
 
   return (
     <section id="about" className="hero-section">
@@ -109,7 +109,19 @@ export default function Hero({ data }) {
           <div className="profile-circle-ring">
             <div className="profile-circle-inner">
               {photoSrc
-                ? <img src={photoSrc} alt={data.name} className="profile-photo" />
+                ? (
+                  <img
+                    src={photoSrc}
+                    alt={data.name}
+                    className="profile-photo"
+                    onError={(e) => {
+                      if (!e.target.dataset.fallback) {
+                        e.target.dataset.fallback = 'true';
+                        e.target.src = '/profile/prajwal.jpg';
+                      }
+                    }}
+                  />
+                )
                 : (
                   <>
                     <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.7">
