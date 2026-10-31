@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+import shutil
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -21,8 +24,6 @@ from .serializers import (
 
 def ensure_db():
     if os.environ.get('VERCEL') and not os.environ.get('DATABASE_URL'):
-        from pathlib import Path
-        import shutil
         tmp_db = Path('/tmp') / 'db.sqlite3'
         seed_db = Path(__file__).resolve().parent.parent / 'db.sqlite3'
         if not tmp_db.exists() and seed_db.exists():
@@ -32,14 +33,17 @@ def ensure_db():
             except Exception:
                 pass
     try:
+        from django.core.management import call_command
         if not Profile.objects.exists():
-            from django.core.management import call_command
             call_command('seed_data')
+        elif Project.objects.count() < 3:
+            call_command('add_resume_data')
     except Exception:
         try:
             from django.core.management import call_command
             call_command('migrate', interactive=False)
             call_command('seed_data')
+            call_command('add_resume_data')
         except Exception as e:
             print("Auto-migrate error:", e)
 
